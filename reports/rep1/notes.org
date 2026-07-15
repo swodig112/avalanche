@@ -1,0 +1,277 @@
+#+TITLE: Progress Report
+#+AUTHOR: Soroush Seirani G.
+#+OPTIONS: tex:t toc:nil
+
+#+latex_class: article
+#+latex_class_options:
+#+latex_header: \newcommand{\avg}[1]{\langle #1 \rangle}
+#+latex_header_extra:
+#+description:
+#+keywords:
+#+subtitle:
+#+latex_footnote_command: \footnote{%s%s}
+#+latex_engraved_theme:
+#+latex_compiler: pdflatex
+#+date: \today
+
+
+* Modeling of Spin Systems Using Networks
+Assuming a Hamiltonian:
+#+begin_export latex
+$$
+\mathcal{H} = \sum_{i,j} J_{ij} \sigma_i \sigma_j - \mu \sum_{i} h_i \sigma_i
+$$
+#+end_export
+Which represents the Ising Spin Model, We can model this system using
+a network where each particle is a node:
+#+begin_export latex
+\begin{align*}
+f_{act}  (x) &= x &\text{Unity Activation}\\
+w_{ij} &= J_{ij}  &\text{Weight represents the interaction}\\
+h_i' &= -\mu h_i &\text{Threshold is the external input (Usually $h_i=h$)}
+\end{align*}
+#+end_export
+
+This model allows us to predict the statistical properties of the
+system and analyze its criticality. Predicting the Curie temperature
+$T_c$ would be a good example.
+
+Though it is to say that in this paper the network was simplified so
+more work will have to be done to simulate spin systems using this
+method. However I think such projects have already been done.
+* Simulation of the Dynamics of the System in the Paper
+In the file ~avalanche.py~ I have simulated the purely
+excitory system numerically. To simulate a network, it assumes an initial condition (In this case A=1) and calculates the probability of transitions in each timestep. By using those probabilities it evolves the system and counts the number of activations (Q $\rightarrow$ A). You can see the results alongside a fitted power law below:
+
+#+begin_export latex
+\begin{center}
+  \includegraphics[width=\textwidth]{fig3.png}
+\end{center}
+#+end_export
+* System Size Expansion
+This is a quick summary of what I understood:
+
+#+begin_export latex
+\begin{align*}
+\frac{d P_n(t)}{d t}= & \alpha(n+1) P_{n+1}(t) \\
+& -\alpha n P_n(t) \\
+& +f\left(\frac{w(n-1)}{N}+h\right)(N-(n-1)) P_{n-1}(t) \\
+& -f\left(\frac{w n}{N}+h\right)(N-n) P_n(t) .
+\end{align*}
+#+end_export
+
+Assuming a stable solution $N\mu$ and a stochastic fluctuation
+$N^{1/2} \xi$:
+#+begin_export latex
+\begin{align*}
+\avg{A(t)} &= N\mu (t) + N^{1/2} \xi(t) \\
+&= \sum_{n} n P_n(t) \\
+\frac{d^{} \avg{A(t)}}{d t^{}} &= \sum_{n} n \frac{d^{} P_{n}}{d t^{}}
+\end{align*}
+#+end_export
+
+Collecting the terms in $\alpha$ and noticing we're summing over a
+dummy index (Also $P_{N+1}=0$):
+#+begin_export latex
+\begin{align*}
+\sum_{n} n\left [ \alpha(n+1) P_{n+1}(t) -\alpha n P_n(t) \right ] &=
+\sum_{n} n\left [ \alpha(n+1) P_{n}(t) -\alpha n P_n(t) \right ] \\
+&= -\alpha \sum_{n} n P_n(t)\\
+&=-\alpha \avg{A(t)}
+\end{align*}
+#+end_export
+
+Now we consider the terms involving the activation function $f$. Using the notation $\hat{f} = f(w\mu +h)$ and noticing (again) the dummy indices:
+#+begin_export latex
+\begin{align*}
+\sum_n f(w n / N + h) (N - n) P_n(t) = \sum_n \hat{f} (N - n) P_n(t)
+\end{align*}
+#+end_export
+
+Putting the results together:
+
+#+begin_export latex
+\begin{align*}
+  \frac{d^{} \avg{A}}{d t^{}} &= %N\frac{d^{} \mu}{d t^{}} \\
+  -\alpha \avg{A(t)} +  \sum_n \hat{f} (N - n) P_n(t)
+\end{align*}
+Assuming most of the contribution is when $n=A=N\mu$:
+\begin{align*}
+  &= -\alpha \avg{A(t)} + (N - A) \hat{f} P_A(t)\\
+  N \frac{d^{} \mu}{d t^{}} &= -\alpha N \mu + (N - N\mu) f(w\mu + h)\\
+ \frac{d^{} \mu}{d t^{}} &= -\alpha \mu + (1 - \mu) \hat{f}
+\end{align*}
+#+end_export
+This concludes the proof for Eq. 10. Note that the thermodynamic limit is strongly considered here.
+
+Let's try to prove Eq. 11:
+#+begin_export latex
+\begin{align*}
+  n(t) &= N\mu (t) + \sqrt{N} \xi (t),\\
+  \frac{d^{} n}{d t^{}} &= -\alpha n + (N - n) f(\frac{nw}{N}+h),
+\end{align*}
+#+end_export
+
+Next we insert our expression for $n$ into its derivative:
+
+#+begin_export latex
+\begin{align*}
+  \frac{d^{} n}{d t^{}} &= -\alpha N \mu - \alpha \sqrt{N}\xi
+                          +(N-N \mu -\sqrt{N} \xi)
+                          f(w\mu+h+N^{-1/2}w\xi) \\
+  &= -\alpha N \mu - \alpha \sqrt{N}\xi
+    +(N-N \mu -\sqrt{N} \xi)
+    (\hat{f}+N^{-1/2}w\xi\hat{f}')) \\
+  &= (-\alpha N \mu + (N-N\mu) \hat{f}) - \xi \sqrt{N}(\alpha + (1 - \mu)w\hat{f}' + \hat{f}) +O(\xi^2)\\
+  &= N \frac{d^{} \mu}{d t^{}} +\sqrt{N} \frac{d \xi}{d t}
+\end{align*}
+#+end_export
+
+By simplifying equations from both sides:
+
+#+begin_export latex
+$$
+\frac{d^{} \xi}{d t^{}}=- (\alpha+\hat{f}-w\hat{f}'(1-\mu))\xi
+$$
+#+end_export
+
+Note that we assumed the thermodynamic limit to find the time
+derivative of $\mu$ so:
+#+begin_export latex
+$$
+\frac{d^{} \avg{\xi}}{d t^{}}=- (\alpha+\hat{f}-w\hat{f}'(1-\mu))\avg{\xi}
+$$
+#+end_export
+
+
+# Now I'll show how we can prove Eq. 12. First let's calculate $\avg{n^2}$:
+# #+begin_export latex
+# \begin{align*}
+#   \avg{n^2} &= \sum_n n^2 P_n\\
+#   \frac{d^{} \avg{n^2}}{d t^{}} &= \sum_n n^2 \frac{d^{} P_n}{d t^{}}
+#   \end{align*}
+  
+#   let
+#   $$
+#   R^+ = f(wn/N+H)(N-n),\quad R^- = \alpha n
+#   $$
+
+#   After manipulation of indices we get:
+#   \begin{align*}
+#   \frac{d^{} \avg{n^2}}{d t^{}} &=\sum_n\left[(n+1)^2 R^{+}(n)+(n-1)^2 R^{-}(n)-n^2 R^{+}(n)-n^2 R^{-}(n)\right] P_n\\
+#   &=  \left\langle(2 n+1) R^{+}(n)+(1-2 n) R^{-}(n)\right\rangle
+# \end{align*}
+# #+end_export
+
+I won't prove Eq. 12 here because I won't use it later in this report.
+
+* Critical Slowing Down
+Assume the identity function and rewrite the evolution of $\mu$:
+
+#+begin_export latex
+\begin{align*}
+  \frac{d^{} \mu}{d t^{}} &= \mu((w-\alpha)-w\mu) = \mu(A-B\mu)\\
+  \rightarrow \frac{d^{} \mu}{\mu(A-B\mu)^{}} &= dt = d\mu\left[\frac{1}{A\mu}+\frac{B/A}{A-B\mu}\right]\\
+  t+C &= \frac{1}{A}\ln{\mu} + \frac{B}{A}\frac{-1}{B}\ln{A-B\mu}\\
+  Ce^{At} &= \frac{\mu}{A-B\mu}\\
+  \mu&=ACe^{At}-BCe^{At}\mu\\
+  \mu&=\frac{AC}{e^{-At}+BC}
+\end{align*}
+#+end_export
+
+This shows an exponential return to the steady state assuming $w\ne\alpha$. Now let's analyze the critical point $w=\alpha$:
+
+#+begin_export latex
+\begin{align*}
+  \frac{d^{} \mu}{d t^{}}&=\mu((w-\alpha)-w\mu)\\
+  &=-w\mu^2
+\end{align*}
+#+end_export
+
+Seperation of variables:
+
+#+begin_export latex
+\begin{gather*}
+  \frac{d\mu}{\mu^2}=-wdt\\
+  \frac{-1}{\mu}=-wt+C\\
+  \mu=\frac{1}{wt+C}
+\end{gather*}
+#+end_export
+
+As you can see in criticality the system follows a power law to return
+to the steady state. This is an important characteristic of critical
+systems.
+
+* Divergence of Susceptibility
+
+The author doesn't directly discuss susceptibility but I'd like to use its definition from electromagnetism and relate it to the spin system and use the analogy to define susceptibility for this network:
+
+#+begin_export latex
+$$
+\vec{M} = \chi \vec{H} \rightarrow
+\chi_{ij} = \frac{\partial^{} M_i}{\partial H_j^{}}
+$$
+
+Since only one dimension matters to us:
+$$
+\chi=\frac{\partial^{} M}{\partial H^{}}
+$$
+#+end_export
+
+In our case of spin systems we can express the total magnetization of the system using a sum over spins:
+#+begin_export latex
+$$
+\chi = \frac{\partial^{} M}{\partial H^{}}=N \frac{\partial^{} \avg{\mu_m}}{\partial H^{}} = N \frac{\partial^{} \avg{s}}{\partial H^{}}=\frac{\partial^{} }{\partial H^{}}(\frac{1}{N}\sum_is_i)
+$$
+#+end_export
+
+Using the analogy we made of the network and a spin system we can define susceptibility:
+#+begin_export latex
+$$
+\chi := \frac{\partial^{} \mu}{\partial h^{}}
+$$
+#+end_export
+
+We again assume identity activation:
+#+begin_export latex
+$$  \frac{d^{} \mu}{d t^{}} = -\alpha \mu + (1 - \mu) f(w\mu+h)=0$$
+#+end_export
+
+since we want to study its behaviour in the critical point of the system we assume the time derivative equals zero and calculate its implicit differentiation with regards to $h$:
+#+begin_export latex
+\begin{align*}
+  0=-\alpha \frac{\partial^{} \mu}{\partial h^{}} - \frac{\partial^{} \mu}{\partial h^{}}(w\mu+h) + (1-\mu) (w \frac{\partial^{} \mu}{\partial h^{}} + 1)
+\end{align*}
+#+end_export
+
+Solving for $\frac{\partial^{} \mu}{\partial h^{}}$:
+#+begin_export latex
+\begin{align*}
+  \frac{\partial^{} \mu}{\partial h^{}}&=\frac{(1-\mu)}{-g'(\mu)}\\
+  g(\mu) &= -\alpha \mu +(1-\mu)f(w\mu+h)
+\end{align*}
+#+end_export
+
+Note that:
+#+begin_export latex
+$$
+\frac{\partial^{} \avg{\xi}}{\partial t^{}} = g'(\mu)\avg{\xi}
+$$
+#+end_export
+
+As we're analyzing the system in the steady state $\mu=0$:
+#+begin_export latex
+\begin{align*}
+  g'(\mu=0) &= wf'(0) - \alpha\\
+  \chi &= \frac{1}{\alpha - wf'(0)}
+\end{align*}
+#+end_export
+
+Since we're assuming identity activation:
+#+begin_export latex
+$$
+\chi = \frac{1}{\alpha-w}
+$$
+#+end_export
+
+It should be obvious that as $w$ approaches $\alpha$ the susceptibility diverges
