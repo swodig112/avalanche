@@ -8,6 +8,8 @@
 #+latex_header: \usepackage{amssymb}
 # #+latex_header: \usepackage[thinc]{esdiff}
 #+latex_header: \usepackage[thinc]{physics}
+#+latex_header: \usepackage{geometry}
+#+latex_header: \geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
 #+latex_header_extra:
 #+description:
 #+keywords:
