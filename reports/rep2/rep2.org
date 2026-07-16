@@ -55,3 +55,10 @@ You can see the result of $1,000,000$ simulations below:
 
 
 * Replicating The First Two Graphs
+#+begin_center
+[[file:fig2.png]]
+#+end_center
+
+#+begin_center
+[[file:fig3.png]]
+#+end_center
