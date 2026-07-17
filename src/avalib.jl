@@ -38,6 +38,21 @@ function direct_sample_avalanche_size(N, weight, α_param, initial, dt)
     return avchsize
 end
 
+function gillespie_sample_avalanche_size(N, R0, initial)
+    q(i) = (N)/(R0 * (N - i) + N)
+    A = initial
+    turnons = 0
+    while A > 0
+        if rand() < q(A) || A >= N
+            A -= 1
+        else
+            A += 1
+        end
+        turnons += 1
+    end
+    turnons
+end
+
 function logspace(a, b, length=50)
     10 .^ range(log10(a), log10(b), length=length)
 end
