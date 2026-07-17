@@ -1,3 +1,5 @@
+# %% Initializing
+ENV["DISPLAY"] = ":0"
 using ProgressMeter
 using Distributed
 using PyPlot
