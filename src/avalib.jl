@@ -84,5 +84,46 @@ function generate_time_evolution_data(N, weight, α_param, initial, dt, T)
     tdata
 end
 
+function build_tridiag(f1,f2,f3,N)
+    d1 = [f1(i) for i in 1:N-1]
+    d2 = [f2(i) for i in 1:N]
+    d3 = [f3(i) for i in 1:N-1]
+    Tridiagonal(d1, d2, d3)
+end
+
+
+function exactp(R0, N)
+    # Using this function isn't recommended unless you only
+    # want to calculate P for a few values. If you want to plot
+    # (e.g. need to calculate many Ps) use probability_sequence
+    # below
+    q(i) = (N)/(R0 * (N - i) + N)
+    A = build_tridiag(i -> 1-q(i), i->0, i -> q(i+1), N)
+    p0 = zeros(N)
+    p0[1] = 1
+    function P(k)
+        # q(1) * p0' * A^(2*(floor(k)-1)) * p0
+        q(1) * p0' * matrix_power(A,2*(floor(k)-1))  * p0
+    end
+end
+
+function probability_sequence(R0, N, x)
+    # Here I calculate P as i'm exponentiating A
+    # so it's greatly faster than exactp
+    q(i) = (N)/(R0 * (N - i) + N)
+    A = build_tridiag(i -> 1-q(i), i->0, i -> q(i+1), N)
+    p0 = zeros(Float64, N)
+    p0[1] = 1
+    A2 = A^2
+    xp = 1
+    res = zeros(Float64, length(x))
+    for i in 1:length(x)
+        p0 = A2^(floor(x[i])-xp) * p0
+        xp = floor(x[i])
+        res[i] = q(1) * p0[1]
+    end
+    res
+end
+
 
 end
