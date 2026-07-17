@@ -73,18 +73,19 @@ legend()
 ### Second Graph
 # %% Simulate
 
+import DifferentialEquations as DE
 f(A, R, t) = (R*α*A/N) * (N - A) - α  * A
 A0 = 0.25 * N
 tspan = (0, T)
 prob = DE.ODEProblem(f, A0, tspan, 1)
 sol4 = DE.solve(prob, DE.Tsit5(), reltol = 1e-8, abstol = 1e-8)
-prob = DE.ODEProblem(f, A0, tspan, 1.3)
+prob = DE.ODEProblem(f, A0, tspan, 1.5)
 sol5 = DE.solve(prob, DE.Tsit5(), reltol = 1e-8, abstol = 1e-8)
-prob = DE.ODEProblem(f, A0, tspan, 0.7)
+prob = DE.ODEProblem(f, A0, tspan, 0.5)
 sol6 = DE.solve(prob, DE.Tsit5(), reltol = 1e-8, abstol = 1e-8)
 y4 = Avalanche.generate_time_evolution_data(N, α,α,200,dt,T)
-y5 = Avalanche.generate_time_evolution_data(N, 1.3* α,α,200,dt,T)
-y6 = Avalanche.generate_time_evolution_data(N, 0.7*α,α,200,dt,T)
+y5 = Avalanche.generate_time_evolution_data(N, 1.5* α,α,200,dt,T)
+y6 = Avalanche.generate_time_evolution_data(N, 0.5*α,α,200,dt,T)
 td = range(0, T, Int(T/dt))
 plot(td, y4, "g", label="Critical Simulation")
 plot(td, y5, "r", label="Supercritical Simulation")
