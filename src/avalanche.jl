@@ -7,7 +7,7 @@ using PyPlot
 include("avalib.jl")
 using .Avalanche
 
-function distributed_direct_sampling(N, weight, α, initial, dt, N_AVCH)
+function initialize_workers()
     if nprocs() == 1
         addprocs(Sys.CPU_THREADS, exeflags="--project")
     end
@@ -16,24 +16,38 @@ function distributed_direct_sampling(N, weight, α, initial, dt, N_AVCH)
             include("avalib.jl")
         end
     end
+end
+
+function distributed_direct_sampling(N, weight, α, initial, dt, N_AVCH)
+    initialize_workers()
     avch = @showprogress pmap(i -> Avalanche.direct_sample_avalanche_size(N, weight, α, 1, 0.01), 1:N_AVCH)
 end
 
+function distributed_gillespie_sampling(N,R,initial,NAVCH)
+    initialize_workers()
+    avch = @showprogress pmap(i -> Avalanche.gillespie_sample_avalanche_size(N,R,initial), 1:NAVCH)
+end
+
 # %% Set Constants
-T = 10
+T = 20
 N = 800
 α = 1
 initial = 1
 dt = 0.01
 N_AVCH = 100000
-histsize = 500
+histsize = 800
 
 ### First Graph
 
-# %% Run Simulation
-a1 = distributed_direct_sampling(N, α, α, initial, dt, N_AVCH)
-a2 = distributed_direct_sampling(N, 1.1 * α, α, initial, dt, N_AVCH)
-a3 = distributed_direct_sampling(N, 0.9 * α, α, initial, dt, N_AVCH)
+# %% Run Direct Simulation
+a1 = distributed_direct_sampling(N, 0.9*α, α, initial, dt, N_AVCH)
+a2 = distributed_direct_sampling(N, 1 * α, α, initial, dt, N_AVCH)
+a3 = distributed_direct_sampling(N, 1.1 * α, α, initial, dt, N_AVCH)
+
+# %% Run gillespie Simulation
+a1 = distributed_gillespie_sampling(N,0.9,1,N_AVCH)
+a2 = distributed_gillespie_sampling(N,1  ,1,N_AVCH)
+a3 = distributed_gillespie_sampling(N,1.1,1,N_AVCH)
 
 # %% Prepare for Plotting
 x1, y1 = Avalanche.probability_from_samples(a1, histsize)
