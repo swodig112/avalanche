@@ -10,6 +10,15 @@
 #+latex_header: \usepackage[thinc]{physics}
 #+latex_header: \usepackage{geometry}
 #+latex_header: \geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+#+latex_header: \usepackage{xcolor}
+#+latex_header: \usepackage[unicode]{hyperref}
+#+latex_header: \hypersetup{
+#+latex_header:   colorlinks=true,
+#+latex_header:   linkcolor=blue,
+#+latex_header:   citecolor=blue,
+#+latex_header:   urlcolor=blue
+#+latex_header: }
+#+latex_header: \urlstyle{same} % keep URL font same as main text
 #+latex_header_extra:
 #+description:
 #+keywords:
@@ -206,8 +215,12 @@ notation ambiguous and confusing.
 
 ** Migration to Julia
 I moved the codebase from Python to Julia for performance which is
-available in this repository along with the source of all of the reports.
+available in [[https://git.swodig.ir/swodig/avalanche][this repository]][fn:1] along with the source of all of the reports.
 
 ** Parallelism
 I made use of parallelism to speed up direct sampling. Since my CPU
 has 20 logical cores I managed to speed up the simulation by 20 times.
+
+* Footnotes
+
+[fn:1]: https://git.swodig.ir/swodig/avalanche
