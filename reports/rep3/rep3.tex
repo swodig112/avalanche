@@ -1,4 +1,4 @@
-% Created 2026-07-31 Fri 17:27
+% Created 2026-07-31 Fri 17:54
 % Intended LaTeX compiler: xelatex
 \documentclass{article}
 \usepackage{graphicx}
@@ -37,7 +37,7 @@ urlcolor=blue
 
 \maketitle
 \section{Objectives}
-\label{sec:orgaa73a81}
+\label{sec:orgc97934d}
 \begin{itemize}
 \item What is the problem?
 \item What is our goal?
@@ -48,15 +48,15 @@ urlcolor=blue
 \end{itemize}
 \end{itemize}
 \section{Introduction}
-\label{sec:org239e7ab}
+\label{sec:orge1b5820}
 
 The aim of this study is to find the defining characteristics of
 critical networks. By sampling and calculating the exact distribution
 of avalanche sizes we look for the power law often associated with
-such distributions. As we'll see the power law doesn't necessarily apply in
-a finite-size system.
+such distributions. As we have seen the power law doesn't necessarily
+apply in a finite-size system.
 \section{The Stochastic Model}
-\label{sec:org7d8b0a1}
+\label{sec:org4ccbbfd}
 
 Our stochastic model of the network is as follows where \(Q\) denotes
 quiescent (off) and \(A\) active (on):
@@ -84,7 +84,7 @@ network. As I've demonstrated in previous reports, the ratio
   \end{cases}
 \end{gather}
 \subsection{Definition of Avalanche Size}
-\label{sec:org9c735ac}
+\label{sec:org3bdec10}
 
 It's important to determine what we exactly mean by the avalanche
 size:
@@ -97,16 +97,16 @@ By this definition it should be obvious that it doesn't matter whether
 one single node keeps turning off and on for a 100 times or 100 nodes
 turn on together.
 \subsection{Evaluation of the Distribution}
-\label{sec:orgd7c360c}
+\label{sec:org70884fc}
 
 In the rest of the report I'll briefly explain the three methods I
 used to obtain the distribution, two of which were numerical and one
 was analytical and exact.
 \section{Numerical Sampling}
-\label{sec:org94f5a18}
+\label{sec:orgee81c45}
 
 \subsection{Time Evolution}
-\label{sec:org30e3d53}
+\label{sec:org55146b8}
 
 This is the most simple and naive direct sampling method. We allocate
 an array of size \(N\) and turn on one node. Next we calculate the
@@ -119,7 +119,7 @@ This method, despite being very simple, is computationally expensive
 because in many timesteps nothing actually happens. The next method is
 vastly more efficient by being entirely atemporal.
 \subsection{The Gillespie Algorithm}
-\label{sec:org71323af}
+\label{sec:org16e3ab3}
 
 In our stochastic model, the weights are all equal \(w_{ij}=w\) so the
 probability of a node to flip only depends on its current state. We
@@ -142,7 +142,7 @@ red numbers denotes the number of active nodes:
 \includegraphics[width=.9\linewidth]{fig1.png}
 \end{center}
 \section{Exact Solution}
-\label{sec:orgc5ba56e}
+\label{sec:orgf32fcbe}
 
 By building on the probability tree we can exactly calculate the
 probability of an avalanche of a specific size. Assume we have a
@@ -207,19 +207,19 @@ the matrix is represented as:
 \end{center}
 
 is improper because it doesn't explicitly state what index \(c_i\) ends
-at or what index \(b_i\) starts at. Also by not dedicating an extra
+at or what index \(b_i\) starts from. Also by not dedicating an extra
 column to the matrix to represent the dead state, the sum of
 probabilities doesn't equal \(1\). These are the reasons I find this
 notation ambiguous and confusing.
 \section{Programming Aspects}
-\label{sec:org36c76ca}
+\label{sec:org57959da}
 
 \subsection{Migration to Julia}
-\label{sec:org20dbaf4}
+\label{sec:orgc3b1e6d}
 I moved the codebase from Python to Julia for performance which is
 available in \href{https://git.swodig.ir/swodig/avalanche}{this repository}\footnote{: \url{https://git.swodig.ir/swodig/avalanche}} along with the source of all of the reports.
 \subsection{Parallelism}
-\label{sec:orga8e4245}
+\label{sec:org38673f7}
 I made use of parallelism to speed up direct sampling. Since my CPU
 has 20 logical cores I managed to speed up the simulation by 20 times.
 \end{document}

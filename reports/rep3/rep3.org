@@ -41,8 +41,8 @@
 The aim of this study is to find the defining characteristics of
 critical networks. By sampling and calculating the exact distribution
 of avalanche sizes we look for the power law often associated with
-such distributions. As we'll see the power law doesn't necessarily apply in
-a finite-size system.
+such distributions. As we have seen the power law doesn't necessarily
+apply in a finite-size system.
 
 * The Stochastic Model
 
@@ -206,7 +206,7 @@ the matrix is represented as:
 #+end_center
 
 is improper because it doesn't explicitly state what index $c_i$ ends
-at or what index $b_i$ starts at. Also by not dedicating an extra
+at or what index $b_i$ starts from. Also by not dedicating an extra
 column to the matrix to represent the dead state, the sum of
 probabilities doesn't equal $1$. These are the reasons I find this
 notation ambiguous and confusing.
