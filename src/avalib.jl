@@ -128,7 +128,7 @@ function probability_sequence(R0, N, x)
     A2 = A^2
     xp = 1
     res = zeros(Float64, length(x))
-    for i in 1:length(x)
+    @showprogress for i in 1:length(x)
         p0 = A2^(floor(x[i])-xp) * p0
         xp = floor(x[i])
         res[i] = q(1) * p0[1]
