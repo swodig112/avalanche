@@ -57,11 +57,22 @@ function logspace(a, b, length=50)
     10 .^ range(log10(a), log10(b), length=length)
 end
 
-function probability_from_samples(avch, length)
+function probability_from_samples(avch, bin_nums)
     min_size = minimum(filter(s -> s > 0, avch))
     max_size = maximum(avch)
-    bin_edges = logspace(min_size, max_size, length)
+    # bin_edges = logspace(min_size, max_size, bin_nums)
+    # bin_edges = range(min_size, max_size, bin_nums)
+    # bin_edges = 0.5 : 1.0 : (max_size + 0.5)
+    bin_edges = exp10.(range(log10(min_size), log10(max_size), length=bin_nums+1))
+    bin_edges = unique(round.(Int, bin_edges))
     h_raw = fit(Histogram, avch, bin_edges)
+    counts = h_raw.weights
+    widths = diff(bin_edges)
+    centers = sqrt.(bin_edges[1:end-1] .* bin_edges[2:end])
+    total_samples = length(avch)
+    density = counts ./ (total_samples .* widths)
+    valid = density .> 0
+    return centers[valid], density[valid]
     h_norm = normalize(h_raw, mode=:probability)
 
     counts = h_norm.weights
