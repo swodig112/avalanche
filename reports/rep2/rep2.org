@@ -48,17 +48,20 @@ uniquely determined from the normalization condition:
 
 Where $\zeta$ is Reimann's zeta function.
 
-You can see the result of $1,000,000$ simulations below:
+You can see the result of $1,000,000$ simulations and the exact solution below:
 #+begin_center
 [[file:fig1.png]]
 #+end_center
 
 
 * Replicating The First Two Graphs
+
+The first graph is similar to the previous one but also includes the subcritical ($R<1$) and supercritical ($R>1$) cases:
 #+begin_center
 [[file:fig2.png]]
 #+end_center
 
+The next graph is simply a time evolution of a system of neurons where you can see the number of active neurons at any point in time and observe the stabilizing of the system:
 #+begin_center
 [[file:fig3.png]]
 #+end_center
