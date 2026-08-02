@@ -123,8 +123,8 @@ Assuming there are currently $A$ active nodes, $q_i$ denotes the
 probability of the next event being a turn-off:
 #+begin_export latex
 \begin{align}
-  q_i &= \frac{\alpha N}{w(N-i)+\alpha N}= \frac{N}{R_0(N-i)+N}\\
-  1-q_i &= \frac{w(N-i)}{w(N-i)+\alpha N} = \frac{R_0(N-i)}{R_0(N-i)+N}
+  q_i &= \frac{\alpha N}{w(N-i)+\alpha N}= \frac{N}{R(N-i)+N}\\
+  1-q_i &= \frac{w(N-i)}{w(N-i)+\alpha N} = \frac{R(N-i)}{R(N-i)+N}
 \end{align}
 #+end_export
 
@@ -160,8 +160,9 @@ after every event (in every layer):
 \end{gather}
 #+end_export
 
-where $b_i=(1-q_{i-1})$ and $c_i=q_{i}$ except for $i=0$ where $b_0=0$. Note that I've used a slightly different formulation from
-the paper where $\mathbf{A}$ is a square matrix of size $N$ instead of
+where $b_i=(1-q_{i-1})$ and $c_i=q_{i}$ except for $i=1$ where
+$b_1=0$. Note that I've used a slightly different formulation from the
+paper where $\mathbf{A}$ is a square matrix of size $N$ instead of
 $N+1$.
 
 Since the first column of our matrix is zero, an avalanche that has
