@@ -74,6 +74,23 @@ function gillespie_sample_avalanche_size(adjmat::AbstractMatrix,
     avchsize
 end
 
+function gillespie_evolve_nodes(adjmat::AbstractMatrix,
+                                α::AbstractVector,
+                                nodes::AbstractVector,
+                                steps=1)
+    for i=1:steps
+        p = adjmat * nodes
+        p[nodes .== 1] .= α[nodes .== 1]
+        idx = sample(Weights(p./sum(p)))
+        if nodes[idx] == 1
+            nodes[idx] = 0
+        else
+            nodes[idx] = 1
+        end
+    end
+    nodes
+end
+
 function logspace(a, b, length=50)
     10 .^ range(log10(a), log10(b), length=length)
 end
