@@ -53,14 +53,16 @@ function gillespie_sample_avalanche_size(N, R0, initial)
     turnons
 end
 
-function gillespie_sample_avalanche_size(adjmat::AbstractMatrix, α::AbstractVector, initial::Function)
+function gillespie_sample_avalanche_size(adjmat::AbstractMatrix,
+                                         α::AbstractVector,
+                                         initial::Function)
     N = size(α)
-    nodes = zeros(UInt8, N)
-    nodes[initial()] .+= 1
+    nodes = zeros(N)
+    nodes[initial()] += 1
     avchsize = sum(nodes)
     while sum(nodes) > 0
         p = adjmat * nodes
-        p[nodes .== 1] = α[nodes .== 0]
+        p[nodes .== 1] .= α[nodes .== 1]
         idx = sample(Weights(p./sum(p)))
         if nodes[idx] == 1
             nodes[idx] = 0
