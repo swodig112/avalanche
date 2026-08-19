@@ -98,9 +98,6 @@ end
 function probability_from_samples(avch, bin_nums)
     min_size = minimum(filter(s -> s > 0, avch))
     max_size = maximum(avch)
-    # bin_edges = logspace(min_size, max_size, bin_nums)
-    # bin_edges = range(min_size, max_size, bin_nums)
-    # bin_edges = 0.5 : 1.0 : (max_size + 0.5)
     bin_edges = exp10.(range(log10(min_size), log10(max_size), length=bin_nums+1))
     bin_edges = unique(round.(Int, bin_edges))
     h_raw = fit(Histogram, avch, bin_edges)
@@ -111,15 +108,6 @@ function probability_from_samples(avch, bin_nums)
     density = counts ./ (total_samples .* widths)
     valid = density .> 0
     return centers[valid], density[valid]
-    h_norm = normalize(h_raw, mode=:probability)
-
-    counts = h_norm.weights
-    bin_centers = (bin_edges[1:end-1] .+ bin_edges[2:end]) ./ 2
-
-    valid_indices = findall(counts .> 0)
-    x_data = bin_centers[valid_indices]
-    y_data = counts[valid_indices]
-    x_data, y_data
 end
 
 function generate_time_evolution_data(N, weight, α_param, initial, dt, T)
