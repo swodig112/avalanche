@@ -135,7 +135,7 @@ function exactp(R0, N)
     # (e.g. need to calculate many Ps) use probability_sequence
     # below
     q(i) = (N)/(R0 * (N - i) + N)
-    A = build_tridiag(i -> 1-q(i), i->0, i -> q(i+1), N)
+    A = build_tridiag(i -> 1-q(i), i->0.0, i -> q(i+1), N)
     p0 = zeros(N)
     p0[1] = 1
     function P(k)
@@ -148,7 +148,7 @@ function probability_sequence(R0, N, x)
     # Here I calculate P as i'm exponentiating A
     # so it's greatly faster than exactp
     q(i) = (N)/(R0 * (N - i) + N)
-    A = build_tridiag(i -> 1-q(i), i->0, i -> q(i+1), N)
+    A = build_tridiag(i -> 1-q(i), i->0.0, i -> q(i+1), N)
     p0 = zeros(Float64, N)
     p0[1] = 1
     A2 = A^2
