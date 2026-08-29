@@ -17,4 +17,18 @@ function random_network(N, p; directed=false)
     end
     return A
 end
+
+function erdos_reyni(N, p)
+    A = zeros(Float64, N, N)
+    for i in 2:N
+        for j in 1:i-1
+            if rand() < p
+                A[i, j] = 1
+                A[j, i] = 1
+            end
+        end
+    end
+    A
+end
+
 end
