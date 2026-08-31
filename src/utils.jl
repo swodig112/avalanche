@@ -31,4 +31,38 @@ function erdos_reyni(N, p)
     A
 end
 
+function barabasi_albert(N::Int, m::Int; rng=Random.default_rng())
+    @assert N > m ≥ 1
+
+    A = zeros(Int8, N, N)
+    @inbounds for i in 1:(m + 1)
+        for j in (i + 1):(m + 1)
+            A[i, j] = 1
+            A[j, i] = 1
+        end
+    end
+
+    targets = Int[]
+    @inbounds for i in 1:(m + 1)
+        for _ in 1:m
+            push!(targets, i)
+        end
+    end
+
+    @inbounds for new_node in (m + 2):N
+        selected = Set{Int}()
+        while length(selected) < m
+            target = rand(rng, targets)
+            push!(selected, target)
+        end
+        for target in selected
+            A[new_node, target] = 1
+            A[target, new_node] = 1
+            push!(targets, target)
+            push!(targets, new_node)
+        end
+    end
+
+    return A
+end
 end
