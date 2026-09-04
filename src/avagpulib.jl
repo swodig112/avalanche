@@ -10,8 +10,8 @@ using .utils
 
 SEED = 0
 
-@inline function grand(a, b)
-    randu01_f32(UInt64(a), UInt64(b), UInt64(0))[1]
+@inline function grand(a, b, c)
+    randu01_f32(UInt64(a), UInt64(b), UInt64(c))[1]
 end
 
 @inline function matvec!(A, x, i, I, N)
@@ -46,7 +46,7 @@ end
     return N
 end
 
-@kernel function gillespie_sample_avalanche_size(adjmat, α, nodes, p, avchsize, active, counter)
+@kernel function gillespie_sample_avalanche_size(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED)
     I = @index(Global)
     if active[I] != UInt8(0)
     N = length(α)
@@ -59,7 +59,7 @@ end
     end
     J = 0
     while sumons(nodes, I, N) > 0f0 && J < 100
-        idx = sample_idx(p, grand(I,J), I, N)
+        idx = sample_idx(p, grand(I,J + 100 * randstep, SEED), I, N)
         J += 1
         if nodes[idx, I] == 1f0
             nodes[idx,I] = 0f0
@@ -104,8 +104,9 @@ function simulate(N, P)
     # adjmat   = Float32.(utils.erdos_reyni(N,0.1))   |> oneArray
 
     # prog = Progress(P)
+    randstep = 0
     while true
-        gillespie_sample_avalanche_size(backend, 64)(adjmat, α, nodes, p, avchsize, active, counter; ndrange=P)
+        gillespie_sample_avalanche_size(backend, 64)(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED; ndrange=P)
         synchronize()
         remaining = Int(Array(counter)[1])
         completed = P - remaining
@@ -113,6 +114,7 @@ function simulate(N, P)
         # update!(prog, completed)
 
         remaining == 0 && break
+        randstep += 1
     end
     # finish!(prog)
     Array(avchsize)
