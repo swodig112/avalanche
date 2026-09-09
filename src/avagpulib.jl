@@ -17,7 +17,7 @@ end
 @inline function matvec!(A, x, i, I, N)
     s = 0.0f0
     for j in 1:N
-        s += A[i, j] * x[j]
+        s += A[i, j] * x[j,I]
     end
     return s
 end
