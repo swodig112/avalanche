@@ -88,7 +88,7 @@ end
     end
 end
 
-function simulate(N, P)
+function gpu_usage_example(N, P)
     nodes = zeros(UInt8, (N,P))
     for i=1:P
         nodes[rand(1:N),i] = one(UInt8)
@@ -104,6 +104,30 @@ function simulate(N, P)
     # adjmat   = Float32.(utils.erdos_reyni(N,0.1))   |> oneArray
 
     # prog = Progress(P)
+    randstep = 0
+    while true
+        gillespie_sample_avalanche_size(backend, 64)(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED; ndrange=P)
+        synchronize()
+        remaining = Int(Array(counter)[1])
+        completed = P - remaining
+
+        # update!(prog, completed)
+
+        remaining == 0 && break
+        randstep += 1
+    end
+    # finish!(prog)
+    Array(avchsize)
+end
+
+function gpu_sample_avalanche(nodes, α, adjmat)
+    backend  = get_backend(nodes)
+    N, P     = size(nodes)
+    p        = zeros(Float32, (N, P)) |> oneArray
+    avchsize = sum(nodes, dims=1)     |> oneArray
+    active   = ones(UInt8, P)         |> oneArray
+    counter  = Int32[P]               |> oneArray
+
     randstep = 0
     while true
         gillespie_sample_avalanche_size(backend, 64)(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED; ndrange=P)
