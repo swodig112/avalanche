@@ -133,7 +133,7 @@ function gpu_sample_avalanche(nodes, α, adjmat)
     prog = Progress(P)
     randstep = 0
     while true
-        gillespie_sample_avalanche_size(backend, 64)(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED; ndrange=P)
+        gillespie_sample_avalanche_size(backend, 512)(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED; ndrange=P)
         synchronize()
         remaining = Int(Array(counter)[1])
         completed = P - remaining
