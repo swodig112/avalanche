@@ -80,6 +80,8 @@ end
                 end
             end
         end
+        # p .= adjmat * nodes[:,I]
+        # p[nodes == 1] .= α[nodes == 1]
     end
     if sumons(nodes, I, N) == 0
         active[I] = UInt8(0)
@@ -128,6 +130,7 @@ function gpu_sample_avalanche(nodes, α, adjmat)
     active   = ones(UInt8, P)         |> oneArray
     counter  = Int32[P]               |> oneArray
 
+    prog = Progress(P)
     randstep = 0
     while true
         gillespie_sample_avalanche_size(backend, 64)(adjmat, α, nodes, p, avchsize, active, counter, randstep, SEED; ndrange=P)
@@ -135,12 +138,12 @@ function gpu_sample_avalanche(nodes, α, adjmat)
         remaining = Int(Array(counter)[1])
         completed = P - remaining
 
-        # update!(prog, completed)
+        update!(prog, completed)
 
         remaining == 0 && break
         randstep += 1
     end
-    # finish!(prog)
+    finish!(prog)
     Array(avchsize)
 end
 end
