@@ -58,7 +58,7 @@ end
         end
     end
     J = 0
-    while sumons(nodes, I, N) > 0f0 && J < 100
+    while sumons(nodes, I, N) > UInt64(0) && J < 100
         idx = sample_idx(p, grand(I,J + 100 * randstep, SEED), I, N)
         J += 1
         if nodes[idx, I] == 1f0
