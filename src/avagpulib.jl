@@ -178,7 +178,3 @@ gfulav = gpu_sample_fully_connected_network_avalanche_size
     end
 end
 end
-using oneAPI
-# ag = AvalancheGPU
-# backend = oneAPIBackend()
-# res = ag.gpu_sample_fully_connected_network_avalanche_size(UInt64(1000),UInt64(800), 1f0,UInt64(1) ,oneArray,backend)
