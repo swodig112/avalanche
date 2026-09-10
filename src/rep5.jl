@@ -58,7 +58,8 @@ ax = Axis(
     xscale = log10,
     yscale = log10,
     xlabel = "Avalanche Size",
-    ylabel = "Probability"
+    ylabel = "Probability",
+    title  = "Erdos-Reyni constant R"
 )
 fx_plot = Avalanche.logspace(1, maximum(samples[end,:]), histsize)
 using SpecialFunctions
