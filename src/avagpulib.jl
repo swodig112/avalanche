@@ -146,4 +146,39 @@ function gpu_sample_avalanche(nodes, α, adjmat)
     finish!(prog)
     Array(avchsize)
 end
+
+function gpu_sample_fully_connected_network_avalanche_size(batchsize, N, R, initial, gpuarrf, backend)
+    avchsize = zeros(UInt64, batchsize)
+    avchsize .= initial
+    A = deepcopy(avchsize)
+    avchsize = avchsize |> gpuarrf
+    A = A |> gpuarrf
+    println("GOTHERE")
+    # while true
+    gpu_sample_fully_connected_network_avalanche_size_kernel(backend, 512)(avchsize, A, N, R, initial, SEED; ndrange=batchsize)
+    synchronize()
+    # end
+    Array(avchsize)
 end
+
+gfulav = gpu_sample_fully_connected_network_avalanche_size
+
+@kernel function gpu_sample_fully_connected_network_avalanche_size_kernel(avchsize, A, N, R, initial, seed)
+    I = @index(Global)
+    # turnons = initial
+    J = 0
+    while A[I] > 0# && J < 100
+        if grand(J, I, seed) < N*inv(Float32(R * (N - A[I]) + N))
+            A[I] -= UInt64(1)
+        else
+            avchsize[I] += UInt64(1)
+            A[I] += UInt64(1)
+        end
+        J += 1
+    end
+end
+end
+using oneAPI
+# ag = AvalancheGPU
+# backend = oneAPIBackend()
+# res = ag.gpu_sample_fully_connected_network_avalanche_size(UInt64(1000),UInt64(800), 1f0,UInt64(1) ,oneArray,backend)
