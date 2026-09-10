@@ -45,7 +45,6 @@ end
 x = []
 y = []
 for i=1:size(samples)[1]
-    println(size(samples[i,:]))
     xt, yt = Avalanche.probability_from_samples(samples[i,:], histsize)
     push!(x, xt)
     push!(y, yt)
