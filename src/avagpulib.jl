@@ -153,7 +153,6 @@ function gpu_sample_fully_connected_network_avalanche_size(batchsize, N, R, init
     A = deepcopy(avchsize)
     avchsize = avchsize |> gpuarrf
     A = A |> gpuarrf
-    println("GOTHERE")
     # while true
     gpu_sample_fully_connected_network_avalanche_size_kernel(backend, 512)(avchsize, A, N, R, initial, SEED; ndrange=batchsize)
     synchronize()
