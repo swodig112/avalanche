@@ -147,33 +147,58 @@ function gpu_sample_avalanche(nodes, α, adjmat)
     Array(avchsize)
 end
 
-function gpu_sample_fully_connected_network_avalanche_size(batchsize, N, R, initial, gpuarrf, backend)
-    avchsize = zeros(UInt64, batchsize)
-    avchsize .= initial
-    A = deepcopy(avchsize)
-    avchsize = avchsize |> gpuarrf
-    A = A |> gpuarrf
-    # while true
-    gpu_sample_fully_connected_network_avalanche_size_kernel(backend, 512)(avchsize, A, N, R, initial, SEED; ndrange=batchsize)
-    synchronize()
-    # end
+function gpu_sample_fully_connected_network_avalanche_size(
+    batchsize, N, R, initial, gpuarrf, backend)
+    avchsize   = zeros(UInt64, batchsize)
+    avchsize  .= initial
+    A          = deepcopy(avchsize)
+    avchsize   = avchsize               |> gpuarrf
+    A          = A                      |> gpuarrf
+    counter    = [batchsize]            |> gpuarrf
+    active     = ones(UInt8, batchsize) |> gpuarrf
+    randstep   = 0
+    while true
+        gpu_sample_fully_connected_network_avalanche_size_kernel(
+            backend, 512)(avchsize,
+                          A, N, R, initial,
+                          counter,
+                          randstep, SEED;
+                          ndrange=batchsize)
+        synchronize()
+        randstep += 1
+        ctr = Array(counter)[]
+        if ctr == 0
+            break
+        end
+
+    end
     Array(avchsize)
 end
 
 gfulav = gpu_sample_fully_connected_network_avalanche_size
 
-@kernel function gpu_sample_fully_connected_network_avalanche_size_kernel(avchsize, A, N, R, initial, seed)
+@kernel function gpu_sample_fully_connected_network_avalanche_size_kernel(
+    avchsize,
+    A, N, R, initial,
+    counter,
+    randstep, seed)
     I = @index(Global)
-    # turnons = initial
     J = 0
-    while A[I] > 0# && J < 100
-        if grand(J, I, seed) < N*inv(Float32(R * (N - A[I]) + N))
+    while A[I] > 0 && J < 10000
+        if grand(I, J + 1000 * randstep, seed) < N*inv(Float32(R * (N - A[I]) + N))
             A[I] -= UInt64(1)
-        else
+        elseif A[I] < N
             avchsize[I] += UInt64(1)
             A[I] += UInt64(1)
+        else
+            A[I] -= UInt64(1)
         end
         J += 1
+        if A[I] == 0
+            Atomix.@atomic counter[] -= 1
+            break
+        end
     end
 end
+
 end
