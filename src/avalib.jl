@@ -110,6 +110,17 @@ function probability_from_samples(avch, bin_nums)
     return centers[valid], density[valid]
 end
 
+function probability_from_samples(avch, bin_edges::AbstractVector)
+    h_raw = fit(Histogram, avch, bin_edges)
+    counts = h_raw.weights
+    widths = diff(bin_edges)
+    centers = sqrt.(bin_edges[1:end-1] .* bin_edges[2:end])
+    total_samples = length(avch)
+    density = counts ./ (total_samples .* widths)
+    valid = density .> 0
+    return centers[valid], density[valid]
+end
+
 function generate_time_evolution_data(N, weight, α_param, initial, dt, T)
     nodes = zeros(Int, N)
     nodes[1:initial] .= 1
