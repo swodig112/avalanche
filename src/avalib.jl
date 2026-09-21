@@ -106,8 +106,9 @@ function probability_from_samples(avch, bin_nums)
     centers = sqrt.(bin_edges[1:end-1] .* bin_edges[2:end])
     total_samples = length(avch)
     density = counts ./ (total_samples .* widths)
-    valid = density .> 0
-    return centers[valid], density[valid]
+    # valid = density .> 0
+    # return centers[valid], density[valid]
+    return centers, density
 end
 
 function probability_from_samples(avch, bin_edges::AbstractVector)
@@ -117,8 +118,8 @@ function probability_from_samples(avch, bin_edges::AbstractVector)
     centers = sqrt.(bin_edges[1:end-1] .* bin_edges[2:end])
     total_samples = length(avch)
     density = counts ./ (total_samples .* widths)
-    valid = density .> 0
-    return centers[valid], density[valid]
+    # valid = density .> 0
+    return centers, density
 end
 
 function generate_time_evolution_data(N, weight, α_param, initial, dt, T)
