@@ -198,7 +198,7 @@ gfulav = gpu_sample_fully_connected_network_avalanche_size
     I = @index(Global)
     J = 0
     while A[I] > 0 && J < 10000
-        if grand(I, J + 1000 * randstep, seed) < N*inv(Float32(R * (N - A[I]) + N))
+        if grand(I, J + 10000 * randstep, seed) < N*inv(Float32(R * (N - A[I]) + N))
             A[I] -= UInt64(1)
         elseif A[I] < N
             avchsize[I] += UInt64(1)
