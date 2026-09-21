@@ -158,7 +158,7 @@ function gpu_sample_fully_connected_network_avalanche_size(
     active     = ones(UInt8, batchsize) |> gpuarrf
     randstep   = 0
     # while true
-    for i=1:10
+    @showprogress for i=1:1000
         gpu_sample_fully_connected_network_avalanche_size_kernel(
             backend, 512)(avchsize,
                           A, N, R, initial,
