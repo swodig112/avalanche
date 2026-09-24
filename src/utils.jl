@@ -65,4 +65,10 @@ function barabasi_albert(N::Int, m::Int; rng=Random.default_rng())
 
     return A
 end
+
+function geometric_bernoulli(p)
+    u = rand()
+    return floor(Int, log(u) / log1p(-p))
+end
+
 end
