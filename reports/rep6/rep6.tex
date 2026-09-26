@@ -1,0 +1,155 @@
+% Created 2026-09-26 Sat 23:39
+% Intended LaTeX compiler: xelatex
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\newcommand{\avg}[1]{\langle #1 \rangle}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[thinc]{physics}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\usepackage{xcolor}
+\usepackage[unicode]{hyperref}
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+citecolor=blue,
+urlcolor=blue
+}
+\urlstyle{same} % keep URL font same as main text
+\author{Soroush Seirani G.}
+\date{\today}
+\title{Avalanche's Progress Report 6}
+\hypersetup{
+ pdfauthor={Soroush Seirani G.},
+ pdftitle={Avalanche's Progress Report 6},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={},
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\section{Optimization}
+\label{sec:org645a572}
+I wrote an optimization backend to find for a variable parameter \(N\),
+which \(D\), \(\tau\) and \(R\) give us the least-square error for two given
+simulation results (probability distributions).
+
+\begin{align}
+  x[i] &\longrightarrow \frac{x[i]}{N^D}\\
+  y[i] &\longrightarrow y[i] \cdot x^{\tau}[i]
+\end{align}
+
+However due to the sheer amount of compute per iteration this wasn't
+feasible and didn't produce good results. I did manage to write a
+single-parameter optimization which only optimized for \(R\). However, I
+didn't get to high values of \(R\) because supercritical systems have a
+long simulation time. This made me look into a way to speed up the
+simulation.
+\section{Algorithmic Optimization of the Stochastic Simulation}
+\label{sec:org58d5535}
+Since I had used up all the numerical tricks I knew of, I turned to an
+LLM to get some ideas. It told me it's common practice to model this
+avalanche as a branching process. It offered an algorithm of time
+complexity \(O(N)\). I spent most of my time studying this new
+algorithm. I've adapted an elementary version of this which isn't
+complete (isn't of \(O(N)\) yet) but I'll complete it in the following
+week.
+
+The basic idea is to think of avalanches as the transitions that
+happen between levels. Next we should realize that the order of
+transitions doesn't matter. By interchanging the order of transitions,
+neither the probability nor the size change. So we can reorder the
+transitions into a desired format which is easy for us to analyze.
+
+Let \(A\) be the number of active neurons and also designates the level
+we're at. Being at level \(A\) means there are \(A\) active neurons. Let
+\(D_K\) be the number of \emph{downcrossings}: The number of times we go from
+\(k\) to \(k-1\). By this definition \(D_1 = 1\) all the time.
+
+\begin{gather}
+  D_k := k \rightarrow k-1
+\end{gather}
+
+We have also defined \(p_k\) and \(q_k\):
+
+\begin{gather}
+  p_k := \text{probability of } k \rightarrow k-1\\
+  q_k := \text{probability of } k \rightarrow k+1
+\end{gather}
+
+Now let's assume we're at level \(k\): There is the probability of going
+down and going up. We call the probability of going down the first
+time:
+
+\begin{gather}
+  G_k(0) = p_k
+\end{gather}
+
+Where \(G_k(a)\) denotes the probability we will go from \(k\) to \(k+1\) before
+going down to \(k-1\):
+
+\begin{gather}
+  G_k(1) = q_kp_k\\
+  G_k(a) = q_k^ap_k
+\end{gather}
+
+What I'm trying to get across is this: \textbf{\(G_k(a)\) denotes the
+probability of going up from level \(k\) \(a\) times before finally going
+down to \(k-1\)}.
+
+It's important to see it's normalized:
+
+\begin{align}
+\sum_{i=0}^\infty G_k(i) &= p_k\sum_{i=0}^\infty q^i_k \text{ since } q_k<1 \\
+  &= p_k \frac{1}{1-q_k} = 1
+\end{align}
+
+Now let's look at level 2. Since we know \(D_1=1\) we can see:
+
+\begin{gather}
+  D_2 = G_1
+\end{gather}
+
+Where \(G_1\) denotes a random variable with the discrete probability
+distribution \(P(G_1=a) = q_1^a p_1\). Now if \(D_2 > 2\) (say \(r\) for our
+example) for \(D_3\) we'll have:
+
+\begin{gather}
+  D_3 = \sum_{i=1}^r G_{2,i}
+\end{gather}
+
+Where each of the \(G_{2,i}\) is a random variable with the probability
+distribution of \(G_2\). We can generalize this to an arbitrary level
+\(k\):
+
+\begin{gather}
+D_k = \sum_{i=1}^r G_{k-1,i}
+\end{gather}
+
+This is as far as I've managed to implement. This method gives the same
+simulation results as the Gillespie algorithm. However we haven't yet
+arrived at the time complexity of \(O(N)\). That's due to the arbitrary
+sum of \(r\) random variables. At higher levels \(r\) can grow
+increasingly large.
+
+Since the sum of random geometric variables gives a negative binomial
+distribution, by directly sampling such a distribution for \(D_k\) this
+algorithm arrives exactly at \(O(N)\).
+
+This is a fascinating result but since I'm not sure the approach is
+correct I haven't applied it. My main concern is that it assumes all
+avalanches die. On one hand we were already throwing out undying
+avalanches but Once I'm certain the theory behind this algorithm is
+correct I'll implement it properly.
+\end{document}
