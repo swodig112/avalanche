@@ -103,7 +103,7 @@ function probability_from_samples(avch, bin_nums)
     h_raw = fit(Histogram, avch, bin_edges)
     counts = h_raw.weights
     widths = diff(bin_edges)
-    centers = sqrt.(bin_edges[1:end-1] .* bin_edges[2:end])
+    centers = sqrt.(bin_edges[1:end-1]) .* sqrt.(bin_edges[2:end])
     total_samples = length(avch)
     density = counts ./ (total_samples .* widths)
     # valid = density .> 0
