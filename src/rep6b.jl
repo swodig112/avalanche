@@ -4,10 +4,12 @@ include("avalib.jl")
 using .utils: geometric_bernoulli
 import .Avalanche
 av = Avalanche
+using Distributions
 using GLMakie
 using ProgressMeter
 HISTSIZE = 30
 
+# %%
 function sample_avalanche(N, R, P)
     avch = zeros(P)
     @showprogress for i=1:P
@@ -15,11 +17,15 @@ function sample_avalanche(N, R, P)
         size = 1
         for level=1:N-1
             p = N / (R * (N - level) + N)
-            Dp = 0
-            for j=1:D
-                Dp += geometric_bernoulli(p)
+            # Dp = 0
+            # for j=1:D
+                # Dp += geometric_bernoulli(p)
+            # end
+            # D = Dp
+            D = rand(NegativeBinomial(Int(D), p))
+            if D == 0
+                break
             end
-            D = Dp
             size += D
             
         end
@@ -28,7 +34,7 @@ function sample_avalanche(N, R, P)
     avch
 end
 N = [2000, 500, 500, 500]
-R = Float32[1.01f0, 1.01f0, 1.06f0, 1.1f0]
+R = [1.1, 1.3, 1.2, 1.1]
 totres = []
 
 for i=eachindex(N)
