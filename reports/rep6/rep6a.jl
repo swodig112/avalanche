@@ -5,7 +5,7 @@ include("optlib.jl")
 include("avalib.jl")
 include("avagpulib.jl")
 
-ao = avaopt
+ao = avagpuopt
 av = Avalanche
 ag = AvalancheGPU
 

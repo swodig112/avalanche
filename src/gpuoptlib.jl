@@ -1,4 +1,4 @@
-module avaopt
+module avagpuopt
 using oneAPI
 using Optimization
 using Optim
