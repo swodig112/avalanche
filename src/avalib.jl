@@ -7,6 +7,7 @@ using PyPlot
 using StatsBase
 using LsqFit
 using Statistics
+using Distributions: NegativeBinomial
 
 function evolve_nodes(nodes, weight, α_param, dt=0.01)
     n_nodes = length(nodes)
@@ -174,5 +175,27 @@ function probability_sequence(R0, N, x)
     res
 end
 
+function negbin_sample_avalanche(N, R, P)
+    avch = zeros(P)
+    for i=1:P
+        D = 1
+        size = 1
+        for level=1:N-1
+            p = N / (R * (N - level) + N)
+            # Dp = 0
+            # for j=1:D
+                # Dp += geometric_bernoulli(p)
+            # end
+            # D = Dp
+            D = rand(NegativeBinomial(Int(D), p))
+            if D == 0
+                break
+            end
+            size += D
+        end
+        avch[i] = size
+    end
+    avch
+end
 
 end
