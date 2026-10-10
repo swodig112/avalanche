@@ -29,7 +29,7 @@ bin_edges = unique(round.(Int, bin_edges))
 bin_centers = sqrt.(bin_edges[1:end-1] .* bin_edges[2:end])
 
 ref_samp  = ag.gfulav(BATCHSIZE, REFN, REFR, INITIAL, GPUARRF, BACKEND)
-ref_pdf   = av.probability_from_samples(ref_samp, bin_edges)[1]
+ref_pdf   = av.probability_from_samples(ref_samp, bin_edges)[2]
 
 function convert_xy_with_τD(x, y, τ, D, N)
     return [x ./ N^D, y .* x.^τ]
