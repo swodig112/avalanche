@@ -89,4 +89,47 @@ function plot_network_evolution(A, nodes, evfunc, dims=2)
     end
 end
 
+function avalanche_plot(N, x, y, tau, D)
+    fig = Figure()
+    ax = Axis(
+        fig[1, 1],
+        xscale = log10,
+        yscale = log10,
+        xlabel = L"\text{Avalanche Size} / N^D",
+        ylabel = L"\text{Probability} \times s^{\tau}",
+    )
+
+
+    τ = Observable(tau)
+    D = Observable(D)
+
+    sg = SliderGrid(fig[2, 1],
+                    (label = "τ", range = 0:0.001:5, startvalue = τ),
+                    (label = "D", range = -2.5:0.001:2.5, startvalue = D),
+                    )
+
+    on(sg.sliders[1].value) do val
+        τ[] = val
+    end
+    on(sg.sliders[2].value) do val
+        D[] = val
+    end
+
+    for i in eachindex(x)
+        x_i = @lift [ x[i][j] / (N[i] ^ $(D)) for j in eachindex(x[i]) ]
+        y_i = @lift [ y[i][j] * (x[i][j] ^ $(τ)) for j in eachindex(y[i]) ]
+        scatterlines!(
+            ax,
+            x_i,
+            y_i,
+            marker = :x,
+            label  = "N=$(N[i])"
+        )
+    end
+
+    axislegend(ax)
+    display(fig)
+    fig
+end
+
 end
