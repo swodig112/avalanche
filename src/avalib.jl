@@ -3,7 +3,6 @@ using LinearAlgebra
 using Random
 using ProgressMeter
 using Distributed
-using PyPlot
 using StatsBase
 using LsqFit
 using Statistics
