@@ -13,13 +13,16 @@ R = [1.0461524997991367, 1.0297881371325264, 1.020999827682283, 1.01308494406036
 
 # N = log.(N)
 # N = @. N - 1
-R = @. R - 1
+# N = @. N * 2
+# R = @. R - 1
+# R = @. 1 / R
+# N = @. 1 / N
 # R = log.(R)
 # %% Fitting
 
 model = SRRegressor(
     niterations=50,
-    binary_operators=[+, -, *, /],
+    binary_operators=[+, -, *, /, ^],
     unary_operators=[exp, log],
 )
 mach = machine(model, N, R)
@@ -37,7 +40,7 @@ ax = Axis(
     # xscale = log10,
     # yscale = log10,
     xlabel = "N",
-    ylabel = "1/R",
+    ylabel = "R",
 )
 
 
@@ -49,13 +52,14 @@ scatterlines!(
     label = "Original Data",
 )
 
-for i=3:6
+for i=3
     println("Eq$(i): R = $(replace(mach.report.equation_strings[i],
         "x1" => "N"))")
     lines!(ax,
            X,
            predict(mach, (data=X, idx=i)),
-           label = "Eq$(i)"
+           label = "Eq$(i)",
+           color = "green"
            )
 end
 
